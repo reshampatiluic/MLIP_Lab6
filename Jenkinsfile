@@ -15,16 +15,19 @@ pipeline {
                 sh '''#!/bin/bash
                 echo 'Test Step: We run testing tool like pytest here'
 
-                # TODO fill out the path to conda here
-                # sudo /PATH/TO/CONDA init
+                # Initialize conda for Jenkins
+                source $HOME/miniconda3/bin/activate
 
-                # TODO Complete the command to run pytest
-                # sudo /PATH/TO/CONDA run -n <Envinronment Name> <Command you want to run>
+                # Create mlip environment if it doesn't exist
+                if ! conda env list | grep -q mlip; then
+                    conda create -n mlip python pytest numpy pandas scikit-learn -y -c conda-forge
+                fi
 
-                echo 'pytest not runned'
-                exit 1 #comment this line after implementing Jenkinsfile
+                # Run pytest using conda run
+                conda run -n mlip python -m pytest -v
+                
+                echo 'pytest completed successfully'
                 '''
-
             }
         }
         stage('Deploy') {
